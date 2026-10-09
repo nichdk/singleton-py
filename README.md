@@ -12,33 +12,22 @@ wouldn't work just fine over the entire python 3.x surface.
 ```python
 from singleton import singleton
 
+# all attributes & methods are transparently proxied
 @singleton
 class Database:
     def __init__(self, host="localhost", port=5432):
         self.host = host
         self.port = port
+
+# first call always wins
+db1 = Database()
+# all consecutive attempts to instantiate return the same instance
+db2 = Database()
+
+# see i told you
+assert db1 is db2
 ```
 
 3. yeah, that's about all there is to it
-   
-```python
-# first call always wins.
-db1 = Database()
-# all consecutive attempts to instantiate return the same instance. 
-db2 = Database()
-assert db1 is db2
 
-# classmethods and attributes are transparently proxied.
-@singleton
-class Service:
-    @classmethod
-    def version(cls):
-        return "v2.0"
-
-Service.version()  # "v2.0"
-
-# the original class is accessible via __wrapped__.
-Database.__wrapped__  # <class 'Database'>
-```
-
-:)
+`:)`
