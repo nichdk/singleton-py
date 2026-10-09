@@ -1,39 +1,117 @@
 """
-nk-rt/singleton-py: singleton/singleton.py
-
-PEP 695 type-parameterized singleton decorator and
-descriptor implementation.
+ #  ksi-complex/
+ #  └── ksi-complex.h
+ #
+ #  PEP 695 type-parameterized singleton decorator and
+ #  descriptor implementation.
+ #
+ #  copyright (c) 2026 • skyline rt, llc. • all rights reserved.
+ #
 """
 
-from typing import Any
 
-class _SingletonWrapper[cls_T]:
-    """
-    Enforces a singleton pattern by caching and returning a single class instance. Adheres to 
-    PEP 695 [1] (type parameter syntax) and PEP 8 [2] (structural style guidelines).
+import sys
+from typing import Any, Callable, Hashable
 
-    References
-    ----------
-    [1] https://peps.python.org/pep-0695/
-    [2] https://peps.python.org/pep-0008/
-    """
 
-    def __init__(self, cls: type[cls_T]) -> None:
-        self.__wrapped__: type[cls_T] = cls
-        self._instance: cls_T | None = None
+"""
+  global::singleton() -> type[cls_T]:
+    patches the class it decorates so the first instantiation wins: every later call returns
+      ... that same cached instance and __init__ never runs again, so re-"constructing" a
+      ... singleton cannot reset its state. its one argument is the class being decorated.
+    returns type[cls_T]: the class itself, patched in place rather than wrapped, so isinstance
+      ... checks, classmethods and annotations all behave as though it were undecorated.
+"""
+def singleton[cls_T](cls: type[cls_T]) -> type[cls_T]:
+    original_new = cls.__new__
+    original_init = cls.__init__
+    instance: cls_T | None = None
+    initialized = False
 
-    def __call__(self, *args: Any, **kwargs: Any) -> cls_T:
-        if self._instance is None:
-            self._instance = self.__wrapped__(*args, **kwargs)
-        return self._instance
-    
-    def __getattr__(self, name: str) -> Any:
-        return getattr(self.__wrapped__, name)
-    
+    def __new__(cls: type[cls_T], *args: Any, **kwargs: Any) -> cls_T:
+        nonlocal instance
+        if instance is None:
+            if original_new is object.__new__:
+                instance = original_new(cls)
+            else:
+                instance = original_new(cls, *args, **kwargs)
+        return instance
 
-def singleton[func_T](cls: type[func_T]) -> _SingletonWrapper[func_T]:
-    """
-    A singleton decorator. Returns a wrapper object. Wraps a target class to manage its global
-    instantiation state.
-    """
-    return _SingletonWrapper(cls)
+    def __init__(self: cls_T, *args: Any, **kwargs: Any) -> None:
+        nonlocal initialized
+        if not initialized:
+            original_init(self, *args, **kwargs)
+            initialized = True
+
+    cls.__new__ = staticmethod(__new__)
+    cls.__init__ = __init__
+    return cls
+
+
+"""
+  _MODULE/str: this module's own dotted name, used to skip the decorator's own frames when
+    ... walking the stack out to whoever declared the instance.
+"""
+_MODULE = __name__
+
+
+"""
+  global::call_site() -> tuple[str, int]:
+    the source location of the declaration being made, walking out past this module and past
+      ... any constructor chain so a subclass of any depth still names the caller's own line.
+    returns tuple[str, int]: the caller's filename and line number.
+"""
+def call_site() -> tuple[str, int]:
+    depth = 1
+    while True:
+        frame = sys._getframe(depth)
+        code = frame.f_code
+        here = frame.f_globals.get("__name__") == _MODULE
+        if not here and code.co_name != "__init__":
+            return (code.co_filename, frame.f_lineno)
+        depth += 1
+
+
+"""
+  global::singletons(key) -> Callable[[type[cls_T]], type[cls_T]]:
+    patches the class it decorates so one instance exists per DECLARATION rather than per
+      ... application: the same statement reached again returns what it returned before, and
+      ... a different statement gets its own. its argument is the key to cache against.
+      key/Callable[[], Hashable] | None: names the declaration, defaulting to the caller's own
+        ... source location; a caller with a rule of its own supplies it, and may refuse. None.
+    returns Callable[[type[cls_T]], type[cls_T]]: the decorator, patching in place so that
+      ... isinstance checks, classmethods and annotations behave as though it were absent.
+"""
+def singletons[cls_T](
+    key: Callable[[], Hashable] | None = None
+) -> Callable[[type[cls_T]], type[cls_T]]:
+    site = key if key is not None else call_site
+
+    def decorate(cls: type[cls_T]) -> type[cls_T]:
+        original_new = cls.__new__
+        original_init = cls.__init__
+        instances: dict[Hashable, cls_T] = {}
+        cls.__sk_instances__ = instances
+
+        def __new__(cls: type[cls_T], *args: Any, **kwargs: Any) -> cls_T:
+            where = site()
+            instance = instances.get(where)
+            if instance is None:
+                if original_new is object.__new__:
+                    instance = original_new(cls)
+                else:
+                    instance = original_new(cls, *args, **kwargs)
+                instances[where] = instance
+                instance.__sk_declared__ = False
+            return instance
+
+        def __init__(self: cls_T, *args: Any, **kwargs: Any) -> None:
+            if not self.__sk_declared__:
+                original_init(self, *args, **kwargs)
+                self.__sk_declared__ = True
+
+        cls.__new__ = staticmethod(__new__)
+        cls.__init__ = __init__
+        return cls
+
+    return decorate
