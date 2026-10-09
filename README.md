@@ -1,4 +1,4 @@
-# singleton-py
+## singleton-py
 
 type-parameterized singleton decorator (PEP 695 compliant). zero dependencies. works 
 with all modern type-checkers. tested in python 3.14.6, although i do not see why it 
