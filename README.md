@@ -21,7 +21,7 @@ class Database:
 
 3. yeah, that's about all there is to it
    
-```
+```python
 # first call always wins.
 db1 = Database()
 # all consecutive attempts to instantiate return the same instance. 
