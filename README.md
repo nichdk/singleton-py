@@ -1,16 +1,13 @@
 # singleton-py
 
-type-parameterized singleton decorator for python 3.x (PEP 695 compliant). works with all modern type-checkers. zero dependencies. 11 lines of functional code.
+type-parameterized singleton decorator (PEP 695 compliant). zero dependencies. works 
+with all modern type-checkers. tested in python 3.14.6, although i do not see why it 
+wouldn't work just fine over the entire python 3.x surface.
 
-## INSTALL
+### how to set it up
 
-```bash
-git clone https://github.com/nk-rt/singleton-py.git
-```
-
-no dependencies. just add the repo to `PYTHONPATH` or copy `singleton/singleton.py` into your project.
-
-## USAGE
+1. `git clone https://github.com/nk-rt/singleton-py.git`
+2. create a class and put the decorator thing on it
 
 ```python
 from singleton import singleton
@@ -22,13 +19,14 @@ class Database:
         self.port = port
 ```
 
-just import and drop a `@singleton` decorator above your class definition. yeah, that's all there is to it.
+3. yeah, that's about all there is to it
 
-### USAGE // TECHNICALS
+### things you should know
 
 ```python
-# all calls return the same instance. args are ignored after first init.
+# first call always wins.
 db1 = Database()
+# all consecutive attempts to instantiate return the same instance. 
 db2 = Database()
 assert db1 is db2
 
@@ -44,24 +42,5 @@ Service.version()  # "v2.0"
 # the original class is accessible via __wrapped__.
 Database.__wrapped__  # <class 'Database'>
 ```
-
-### USAGE // SEMANTICS
-
-- **first call wins.** the instance is cached on first `__call__`. subsequent calls ignore new arguments and return the cached instance.
-- **all attributes passthrough.** `__getattr__` delegates attribute lookups to the wrapped class, so `@classmethod` and static attributes work transparently.
-- **underlying structure is preserved.** the undecorated class is preserved via the `__wrapped__` attribute enabling seamless backwards compatability with existing structure-dependent code and/or introspection. 
-
-## REFERENCE
-
-```python
-singleton(cls: type[T]) -> _SingletonWrapper[T]
-```
-
-| Member | Description |
-|---|---|
-| `__call__(*args, **kwargs)` | returns the cached instance, creating it on first call |
-| `__getattr__(name)` | proxies attribute access to the wrapped class |
-| `__wrapped__` | reference to the original, undecorated class |
-
 
 :)
