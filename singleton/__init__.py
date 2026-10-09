@@ -1,8 +1,12 @@
 """
-nk-rt/singleton-py: singleton/__init__.py
-
-Exposes the core singleton decorator at the package level
-for streamlined imports.
+ # nk-rt (www.github.com/nk-rt)
+ # └── singleton_decorator/
+ #   └── singleton.py
+ #
+ # exposes the core singleton decorator at the package level
+ # for streamlined imports.
+ #
+ # (c) 2026. skyline rt, llc. zero rights reserved :')
 """
 
 from .singleton import singleton

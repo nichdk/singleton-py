@@ -1,14 +1,13 @@
 """
- #  ksi-complex/
- #  └── ksi-complex.h
+ # nk-rt (www.github.com/nk-rt)
+ # └── singleton_decorator/
+ #   └── singleton.py
  #
- #  PEP 695 type-parameterized singleton decorator and
- #  descriptor implementation.
+ # pep 695 type-parameterized singleton decorator and descriptor 
+ # implementation.
  #
- #  copyright (c) 2026 • skyline rt, llc. • all rights reserved.
- #
+ # (c) 2026. skyline rt, llc. zero rights reserved :')
 """
-
 
 import sys
 from typing import Any, Callable, Hashable

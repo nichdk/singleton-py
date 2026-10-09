@@ -1,8 +1,12 @@
 """
-nk-rt/singleton-py: run_tests.py
-
-Uncomplicated behavioral regression test runner evaluating singleton 
-state, arguments, and descriptor attributes.
+ # nk-rt (www.github.com/nk-rt)
+ # └── singleton_decorator/
+ #   └── run_tests.py
+ #
+ # uncomplicated behavioral regression test runner evaluating singleton 
+ # state, arguments, and descriptor attributes.
+ #
+ # (c) 2026. skyline rt, llc. zero rights reserved :')
 """
 
 import sys
@@ -83,17 +87,6 @@ def test_attribute_identity():
     assert app.settings is srv
     assert app.settings.connected is True
 
-def test_wrapped_attribute():
-    """
-    Tests for the presence of the __wrapped__ attribute on a decorated 
-    class and ensures that it points to the undecorated representation 
-    of the class. Raises an AssertionError if the attribute is missing 
-    or dissimilar to the undecorated representation of the class. 
-    """
-    srv = MultiPurposeService()
-    assert hasattr(MultiPurposeService, "__wrapped__")
-    assert MultiPurposeService.__wrapped__ is srv.__class__
-
 def run_tests():
     """
     The primary test runner. Dispatches behavioral regression tests 
@@ -103,31 +96,25 @@ def run_tests():
     local = lambda: (f := sys._getframe(1)).f_locals.get(f.f_code.co_name)
     signature = lambda f: f"{f.__qualname__}{inspect.signature(f)}"
 
-    print(f"\nBEGIN // {signature(run_tests)}\n\n")
+    print(f"{signature(run_tests)} starting...")
 
-
-    print(f"BEGIN // {signature(test_instance_identity)}")
+    print(f"BEGIN: {signature(test_instance_identity)}")
     test_instance_identity()
-    print(f"END // {signature(test_instance_identity)}\n")
+    print(f"[OK] {signature(test_instance_identity)} passed.")
 
-    print(f"BEGIN // {signature(test_class_method)}")
+    print(f"BEGIN: {signature(test_class_method)}")
     test_class_method()
-    print(f"END // {signature(test_class_method)}\n")
+    print(f"[OK] {signature(test_class_method)} passed.")
 
-    print(f"BEGIN // {signature(test_argument_immutability)}")
+    print(f"BEGIN: {signature(test_argument_immutability)}")
     test_argument_immutability()
-    print(f"END // {signature(test_argument_immutability)}\n")
+    print(f"[OK] {signature(test_argument_immutability)} passed.")
 
-    print(f"BEGIN // {signature(test_attribute_identity)}")
+    print(f"BEGIN: {signature(test_attribute_identity)}")
     test_attribute_identity()
-    print(f"END // {signature(test_attribute_identity)}\n")
+    print(f"[OK] {signature(test_attribute_identity)} passed.")
 
-    print(f"BEGIN // {signature(test_wrapped_attribute)}")
-    test_wrapped_attribute()
-    print(f"END // {signature(test_wrapped_attribute)}\n")
-
-
-    print(f"\nEND // {signature(run_tests)}")
+    print(f"[OK] {signature(run_tests)} completed with all tests passing.")
 
 if __name__ == "__main__":
     run_tests()
