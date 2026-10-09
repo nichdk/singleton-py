@@ -20,10 +20,8 @@ class Database:
 ```
 
 3. yeah, that's about all there is to it
-
-### things you should know
-
-```python
+   
+```
 # first call always wins.
 db1 = Database()
 # all consecutive attempts to instantiate return the same instance. 
