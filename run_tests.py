@@ -1,6 +1,6 @@
 """
- # nk-rt (www.github.com/nk-rt)
- # └── singleton_decorator/
+ # nk-rt (remote)
+ # └── singleton-py/
  #   └── run_tests.py
  #
  # uncomplicated behavioral regression test runner evaluating singleton 

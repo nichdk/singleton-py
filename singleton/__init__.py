@@ -1,7 +1,8 @@
 """
- # nk-rt (www.github.com/nk-rt)
- # └── singleton_decorator/
- #   └── singleton.py
+ # nk-rt (remote)
+ # └── singleton-py/
+ #   └── singleton/
+ #     └── singleton.py
  #
  # exposes the core singleton decorator at the package level
  # for streamlined imports.

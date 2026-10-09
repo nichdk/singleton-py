@@ -1,7 +1,8 @@
 """
- # nk-rt (www.github.com/nk-rt)
- # └── singleton_decorator/
- #   └── singleton.py
+ # nk-rt (remote)
+ # └── singleton-py/
+ #   └── singleton/
+ #     └── singleton.py
  #
  # pep 695 type-parameterized singleton decorator and descriptor 
  # implementation.
